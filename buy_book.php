@@ -1,5 +1,6 @@
 <?php
 session_start();
+include "mailer.php";
 
 
 ?>
@@ -96,6 +97,15 @@ if(isset($_POST["submit"])) {
    else{
     echo "<h4 class='thank1'> Reg No is Incorret Or Please Fill In All The Mandatory Details</h4>";
   }
+$name= $_SESSION['Name'] ;
+  $email=  $_SESSION['email'];
+  $msg="You Buy the Book   ";
+ if( mailer($email, $msg,  $name)){
+  $echo="mail  send";
+ }
+ else{
+  $echo="mail not send";
+ }
 }
 
 

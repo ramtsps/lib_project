@@ -150,7 +150,8 @@ if(isset($_POST["login"]))
         $_SESSION['reg_no']=$row["Reg_No"];
         $_SESSION['Department']=$row["Department"];
         $_SESSION['date']=$row["date"];
-       
+
+        $_SESSION['Email']=$row["Email"];
         
         
     }

@@ -1,7 +1,9 @@
 <?php
 session_start();
 
-
+// include "con1.php"; 
+include "mailer.php";
+// $obj = new ls();
 ?>
 <!doctype html>
 <html lang="en">
@@ -128,30 +130,51 @@ person_2
     }
    </style>
 <?php
-$obj=new ls(); 
+$obj = new ls(); 
+
 if(isset($_POST["submit"])) {
-  $lib_id = $_POST["Lib_Id"];
-  $Author = $_POST["Author"];
- 
+    $lib_id = $_POST["Lib_Id"];
+    $Author = $_POST["Author"];
 
-  if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
-    $image = $_FILES['image']['tmp_name'];
-    $name = $_FILES['image']['name'];
-    $image = file_get_contents($image);
-    $image = base64_encode($image);
-  } else {
-    echo "Please select an image.";
-    exit;
-  }
+    if(isset($_FILES['image']) && $_FILES['image']['error'] == 0) {
+        $image = $_FILES['image']['tmp_name'];
+        $name = $_FILES['image']['name'];
+        $image = file_get_contents($image);
+        $image = base64_encode($image);
+    } else {
+        echo "Please select an image.";
+        exit;
+    }
 
-  $sql = "INSERT INTO add_book (books_name, Book_Author,image_name, image_type) VALUES ('$lib_id','$Author','$name' ,'$image')";
+    $sql = "INSERT INTO add_book (books_name, Book_Author,image_name, image_type) VALUES ('$lib_id','$Author','$name' ,'$image')";
 
-  if(mysqli_query($obj->connection, $sql)) {
-    echo "<h4 class='thank'>Book Submit Thank You!</h4>";
-  } else {
-    echo "Error: " . mysqli_error($obj->connection);
-  }
+    if(mysqli_query($obj->connection, $sql)) {
+        echo "<h4 class='thank'>Book Submit Thank You!</h4>";
+
+        // Fetch all user emails
+        $result = mysqli_query($obj->connection, "SELECT Email FROM login"); // Adjust table and column name if necessary
+        if ($result) {
+            while ($row = mysqli_fetch_assoc($result)) {
+                $email = $row['Email'];
+                $subject = "New Book Added to Library";
+                $message = "Dear Library Member,\n\nA new book titled '$lib_id' by $Author has been added to the library. Visit us to check it out!\n\nRegards,\nThe Library Team";
+                // Send email to each user
+                if (mailer($email, $message, $subject)) {
+                    echo "Mail sent to: $email<br>";
+                } else {
+                    echo "Error sending email to: $email<br>";
+                }
+            }
+        } else {
+            echo "Error fetching user emails: " . mysqli_error($obj->connection);
+        }
+    } else {
+        echo "Error: " . mysqli_error($obj->connection);
+    }
 }
+
+
+
 ?>
 
 
